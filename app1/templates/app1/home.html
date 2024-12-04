@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Show me Anything</h1>
+        <form id="imageForm" onsubmit="submitForm(event)">
+            {% csrf_token %}
+            <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
+            <img id="imagePreview" src="" alt="Image Preview" style="display: none;">
+            <div id="spinner" class="spinner" style="display: none;"></div>
+            <button type="submit">Open your eyes and see!</button>
+        </form>
+
+        <div id="descriptionContainer" style="margin-top: 20px;"></div>
+    </div>
+
+    <script src="{% static 'scripts.js' %}"></script>
+</body>
+</html>
