@@ -5,7 +5,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Upload</title>
-    <link rel="stylesheet" href="{% static 'styles.css' %}">
+    <style>
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    max-width: 600px;
+    width: 100%;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    display: flex;  
+    flex-direction: column;  
+    align-items: center;
+    justify-content: flex-start;  
+}
+
+
+h1 {
+    font-size: 2rem;
+    color: #4a4a4a;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+input[type="file"] {
+    margin: 20px auto;
+    padding: 10px;
+    border: 2px dashed #007bff;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-size: 1rem;
+    cursor: pointer;
+    color: #007bff;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+input[type="file"]:hover {
+    background-color: #eef6ff;
+    border-color: #0056b3;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    max-height: 350px;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+img:hover {
+    transform: scale(1.02);
+}
+
+button {
+    margin: 20px auto;
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #0056b3, #003f8c);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.spinner {
+    margin: 20px auto;
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+
+    img {
+        max-height: 300px;
+    }
+}
+
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 </head>
 <body>
@@ -22,6 +148,79 @@
         <div id="descriptionContainer" style="margin-top: 20px;"></div>
     </div>
 
-    <script src="{% static 'scripts.js' %}"></script>
+    <script>
+        function previewImage(event) {
+    const imagePreview = document.getElementById("imagePreview");
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    } else {
+        imagePreview.src = "";
+        imagePreview.style.display = "none";
+    }
+}
+
+function getCSRFToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    return csrfToken;
+}
+
+function formatDescription(description) {
+    description = description.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    description = description.replace(/\n/g, "<br>");
+    return description;
+}
+
+async function submitForm(event) {
+    event.preventDefault();
+    
+    const spinner = document.getElementById("spinner");
+    const fileInput = document.getElementById("imageInput");
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert("Please select an image.");
+        return;
+    }
+    
+    spinner.style.display = "block";
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+        const response = await axios.post("", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "X-CSRFToken": getCSRFToken()
+            }
+        });
+
+        alert("Image uploaded successfully!");
+        console.log(response.data); 
+
+
+        const description = response.data.description;
+        const formattedDescription = formatDescription(description);
+
+        const descriptionContainer = document.createElement("div");
+        descriptionContainer.innerHTML = formattedDescription;
+
+        const container = document.querySelector(".container");
+        container.appendChild(descriptionContainer); 
+
+    } catch (error) {
+        alert("An error occurred while uploading the image.");
+        console.error(error);
+    } finally {
+        spinner.style.display = "none";
+    }
+}
+    </script>
 </body>
 </html>
