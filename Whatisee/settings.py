@@ -19,6 +19,7 @@ load_dotenv()
 DEBUG = os.getenv('DEBUG', 'False') == 'True'  # Convert string 'True'/'False' to actual bool
 SECRET_KEY = os.getenv('SECRET_KEY')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+MYHOST = os.getenv('MYHOST')
 
 # Other settings that you want to configure using environment variables...
 
@@ -34,10 +35,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [MYHOST]
 
 # Application definition
 
